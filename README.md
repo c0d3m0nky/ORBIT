@@ -3,7 +3,7 @@
 
 .Net starter-packs of extension methods and utility classes
 
-![Alt tag](/assets/dumb/under-construction.gif "Title tag")
+![90s swag](/assets/dumb/under-construction.gif "90s swag")
 
 These are almost exclusively meant for .Net Standard with some .Net Framework packages to ease forward compatibility with .Net Core
 

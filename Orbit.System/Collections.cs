@@ -37,7 +37,7 @@ namespace Orbit {
             }
         }
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 
         // These will be included in NetStandard2.1
         public static TValue GetValueOrDefault<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary,

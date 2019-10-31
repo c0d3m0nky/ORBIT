@@ -8,6 +8,17 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Orbit</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageOutputPath>../dist/nuget/$(Configuration)/</PackageOutputPath>
+        <Title>Orbit.System</Title>
+        <Description>Core of the Orbit starter packs</Description>
+        <Copyright>Copyright ©2019 Alberto Jose Bec</Copyright>
+        <PackageProjectUrl>https://github.com/c0d3m0nky/ORBIT</PackageProjectUrl>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/c0d3m0nky/ORBIT/master/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/c0d3m0nky/ORBIT</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>extensions</PackageTags>
+        <Authors>Alberto Bec</Authors>
     </PropertyGroup>
 
 </Project>
