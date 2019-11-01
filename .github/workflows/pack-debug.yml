@@ -1,0 +1,31 @@
+name: .NET Core
+
+on: [push]
+
+env:
+  git-version: $GitVersion_SemVer
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Report 1
+      run: echo "The GitVersion is {{ git-version }}. Did that work?"
+#    - name: Setup .NET Core
+#      uses: actions/setup-dotnet@v1
+#      with:
+#        dotnet-version: 2.2.108
+#    - name: Build with dotnet
+#      run: dotnet build -p:Version=$GitVersion_SemVer --configuration Debug
+#    - name: Report 2
+#      run: echo $GitVersion_SemVer
+#    - name: Nuget Pack
+#      run: >- 
+#        dotnet pack ./Orbit.System/Orbit.System.csproj 
+#        -c Debug 
+#        --include-source --include-symbols --no-dependencies 
+#        -o ../dist/Orbit.System/Debug/ 
+#        --version-suffix dev -v d
