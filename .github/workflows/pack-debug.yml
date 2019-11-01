@@ -8,10 +8,10 @@ jobs:
     steps:
       - name: Get Ver Tag
         id: get_version
-        run: echo ::set-output name=VERSION::$( git describe | ack -o '\d+\.\d+\.\d+'; )
+        run: TAGV=$( git describe | ack -o '\d+\.\d+\.\d+'; )
       - uses: actions/checkout@v1
       - name: Report 1
-        run: echo "The Tag Version is ${{ steps.get_version.outputs.VERSION }}. Did that work?"
+        run: echo "The Tag Version is ${TAGV}. Did that work?"
 #    - name: Setup .NET Core
 #      uses: actions/setup-dotnet@v1
 #      with:
