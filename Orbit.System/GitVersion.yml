@@ -1,5 +1,0 @@
-branches:
-  master:
-    is-release-branch: true
-  dev:
-    is-develop: true
