@@ -7,8 +7,8 @@ jobs:
 
     steps:
       - name: Get Ver Tag
-          id: get_version
-          run: echo ::set-output name=VERSION::$( git describe | ack -o '\d+\.\d+\.\d+'; )
+        id: get_version
+        run: echo ::set-output name=VERSION::$( git describe | ack -o '\d+\.\d+\.\d+'; )
       - uses: actions/checkout@v1
       - name: Report 1
         run: echo "The Tag Version is {{ steps.get_version.outputs.VERSION }}. Did that work?"
