@@ -2,6 +2,9 @@ name: .NET Core
 
 on: [push]
 
+env:
+  git-version: $GitVersion_SemVer
+
 jobs:
   build:
 
@@ -10,15 +13,15 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Report 1
-      run: echo $GitVersion_SemVer
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 2.2.108
-    - name: Build with dotnet
-      run: dotnet build -p:Version=$GitVersion_SemVer --configuration Debug
-    - name: Report 2
-      run: echo $GitVersion_SemVer
+      run: echo {{ git-version }}
+#    - name: Setup .NET Core
+#      uses: actions/setup-dotnet@v1
+#      with:
+#        dotnet-version: 2.2.108
+#    - name: Build with dotnet
+#      run: dotnet build -p:Version=$GitVersion_SemVer --configuration Debug
+#    - name: Report 2
+#      run: echo $GitVersion_SemVer
 #    - name: Nuget Pack
 #      run: >- 
 #        dotnet pack ./Orbit.System/Orbit.System.csproj 
