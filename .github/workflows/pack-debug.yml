@@ -15,9 +15,9 @@ jobs:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: echo $RELEASE_VERSION
       - name: Report 1
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: echo "The Tag Version is $RELEASE_VERSION. Did that work? ${GITHUB_REF:10}"
+        #env:
+          #RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: echo "The Tag Version is ${RELEASE_VERSION}. Did that work? ${GITHUB_REF:10}"
 #    - name: Setup .NET Core
 #      uses: actions/setup-dotnet@v1
 #      with:
