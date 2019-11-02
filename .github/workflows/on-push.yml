@@ -2,21 +2,17 @@ name: OnPush
 
 on: [push]
 
-env:
-  AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
-  build:
+  node_test:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
       - name: Node Test
-        outputs:
-          result: # id of output
-            description: 'Run results'
-        run: node ./on-push/action.js
+        uses: ./on-push
+        id: nrun
+        with:
+          auth-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Results
+          run: echo "The time was ${{ steps.nrun.outputs.result }}"
         

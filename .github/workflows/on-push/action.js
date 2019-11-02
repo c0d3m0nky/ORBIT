@@ -15,9 +15,10 @@ try {
 
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = JSON.stringify(github.context.payload, undefined, 2);
-    const authToken = process.env.AUTH_TOKEN;
+    const authToken = core.getInput('auth-token');
+    const envVars = JSON.stringify(process.env,null,2);
 
-    console.log(`Token Snippet: ${authToken.substr(0, 4)}-${authToken.substr(authToken.length - 4)}\nThe event payload:\n${payload}`);
+    console.log(`Token Snippet: ${authToken.substr(0, 4)}-${authToken.substr(authToken.length - 4)}\nThe event payload:\n${payload}\nprocess.env: ${envVars}`);
 } catch (error) {
     core.setFailed(`Failed: ${error.message}`);
 }

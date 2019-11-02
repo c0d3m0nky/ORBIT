@@ -1,0 +1,12 @@
+name: 'Node Test'
+description: 'Run it in Node'
+inputs:
+  auth-token:  # id of input
+    description: 'GitHub Auth Token'
+    required: true
+outputs:
+  result: # id of output
+    description: 'The result'
+runs:
+  using: 'node12'
+  main: 'action.js'
