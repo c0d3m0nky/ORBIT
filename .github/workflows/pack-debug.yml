@@ -6,13 +6,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get Ver Tag
-        id: get_version
-        run: echo echo ::set-output name=tag::$(echo ${GITHUB_REF:10}) # TAGV=$( git describe | ack -o '\d+\.\d+\.\d+'; )
       - uses: actions/checkout@v1
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: echo $RELEASE_VERSION
       - name: Report 1
         env:
-          RELEASE_VERSION: ${{ steps.get_version.outputs.tag }}
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: echo "The Tag Version is $RELEASE_VERSION. Did that work? ${GITHUB_REF:10}"
 #    - name: Setup .NET Core
 #      uses: actions/setup-dotnet@v1
