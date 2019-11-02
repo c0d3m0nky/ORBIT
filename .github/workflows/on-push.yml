@@ -1,5 +1,5 @@
 name: OnPush
-description: Builds and packs commit
+
 on: [push]
 
 env:
