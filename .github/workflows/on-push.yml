@@ -11,11 +11,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
       - name: Node Test
         outputs:
           result: # id of output
             description: 'Run results'
-        runs:
-          using: 'node12'
-          main: './on-push/action.js'
+        run: node ./on-push/action.js
         
