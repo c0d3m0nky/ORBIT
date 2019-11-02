@@ -14,5 +14,4 @@ jobs:
         with:
           auth-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Results
-          run: echo "The time was ${{ steps.nrun.outputs.result }}"
-        
+        run: echo "The time was ${{ steps.nrun.outputs.result }}"
