@@ -1,0 +1,21 @@
+name: OnPush
+description: Builds and packs commit
+on: [push]
+
+env:
+  AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Node Test
+        outputs:
+          result: # id of output
+            description: 'Run results'
+        runs:
+          using: 'node12'
+          main: 'on-push.js'
+        
