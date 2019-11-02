@@ -17,5 +17,5 @@ jobs:
             description: 'Run results'
         runs:
           using: 'node12'
-          main: 'on-push.js'
+          main: './on-push/action.js'
         
