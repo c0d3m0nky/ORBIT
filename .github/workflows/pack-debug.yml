@@ -13,11 +13,24 @@ jobs:
       - name: Check output
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: echo The Tag Version is $RELEASE_VERSION. Did that work?
+        run: echo ReleaseVer - $RELEASE_VERSION. Did that work?
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo GH Context - $GITHUB_CONTEXT
+        if: runner.os != 'Windows'
+      - name: Show GitHub ref
+        run: echo GH Ref - $GITHUB_REF
+        if: runner.os != 'Windows'
+      - name: Dump event JSON
+        env:
+          EVENT_JSON_FILENAME: ${{ github.event_path }}
+        run: echo File Cat - $EVENT_JSON_FILENAME
+        if: runner.os != 'Windows'
       - name: Report 1
         #env:
           #RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: echo "The Tag Version is ${RELEASE_VERSION}. Did that work? ${GITHUB_REF:10}"
+        run: echo The Tag Version is $RELEASE_VERSION. Did that work? ${GITHUB_REF:10}
 #    - name: Setup .NET Core
 #      uses: actions/setup-dotnet@v1
 #      with:
