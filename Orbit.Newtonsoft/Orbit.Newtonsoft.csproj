@@ -2,12 +2,34 @@
 
     <PropertyGroup>
         <Configurations>Release;Debug</Configurations>
-        <Platforms>Any CPU</Platforms>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <Platforms>AnyCPU</Platforms>
         <NeutralLanguage>en-US</NeutralLanguage>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
         <RootNamespace>Orbit</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+        <Title>Orbit.Newtonsoft</Title>
+        <Description>Orbit for Newtonsoft.Json</Description>
+        <Copyright>Copyright ©2019 Alberto Jose Bec</Copyright>
+        <PackageProjectUrl>https://github.com/c0d3m0nky/ORBIT</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/c0d3m0nky/ORBIT</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>extensions</PackageTags>
+        <Authors>Alberto Bec</Authors>
+        <BuildNumber>0</BuildNumber>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <VersionPrefix>1.2.$(BuildNumber)</VersionPrefix>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <OutputPath>bin\Release\</OutputPath>
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <OutputPath>bin\Debug\</OutputPath>
+      <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>

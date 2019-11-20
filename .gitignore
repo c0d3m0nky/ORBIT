@@ -382,3 +382,5 @@ fabric.properties
 .idea/httpRequests
 /.idea/.idea.Orbit/.idea/.name
 /.idea/.idea.Orbit/.idea/projectSettingsUpdater.xml
+
+dist/

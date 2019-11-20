@@ -5,8 +5,8 @@
         <RootNamespace>Orbit</RootNamespace>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageOutputPath>$(OutputPath)</PackageOutputPath>
-        <Title>Orbit.System.Web</Title>
-        <Description>Orbit for System.Web</Description>
+        <Title>Orbit.Crypto</Title>
+        <Description>Orbit for encryption and cryptographically secure pseudorandom data generation</Description>
         <Copyright>Copyright ©2019 Alberto Jose Bec</Copyright>
         <PackageProjectUrl>https://github.com/c0d3m0nky/ORBIT</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>

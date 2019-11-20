@@ -9,7 +9,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{FD900C27-2D1A-4DFF-8010-902F43F181A0}"
 ProjectSection(SolutionItems) = preProject
 	README.md = README.md
+	LICENSE.txt = LICENSE.txt
 EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orbit.Crypto", "Orbit.Crypto\Orbit.Crypto.csproj", "{FCE5461B-1D0A-4369-A671-9317EE2430D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{045AC7B4-966C-4633-9E49-7E359D6C94D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,5 +34,13 @@ Global
 		{527C0FE5-5A17-4EC9-8D3A-6BBB4C32C5F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{527C0FE5-5A17-4EC9-8D3A-6BBB4C32C5F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{527C0FE5-5A17-4EC9-8D3A-6BBB4C32C5F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCE5461B-1D0A-4369-A671-9317EE2430D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCE5461B-1D0A-4369-A671-9317EE2430D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCE5461B-1D0A-4369-A671-9317EE2430D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCE5461B-1D0A-4369-A671-9317EE2430D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{045AC7B4-966C-4633-9E49-7E359D6C94D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{045AC7B4-966C-4633-9E49-7E359D6C94D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{045AC7B4-966C-4633-9E49-7E359D6C94D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{045AC7B4-966C-4633-9E49-7E359D6C94D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
