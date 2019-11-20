@@ -23,13 +23,13 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>extensions</PackageTags>
         <Authors>Alberto Bec</Authors>
-        <PackageIcon>icon-beta-320.jpg</PackageIcon>
+        <PackageIcon>icon-320.png</PackageIcon>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageOutputPath>$(OutputPath)</PackageOutputPath>        
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../assets/icon-beta-320.jpg" Pack="true" PackagePath="\"/>
+        <None Include="../assets/icon-320.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <!-- /Nuget -->
