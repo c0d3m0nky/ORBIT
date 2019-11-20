@@ -5,8 +5,15 @@
         <Platforms>AnyCPU</Platforms>
         <NeutralLanguage>en-US</NeutralLanguage>
         <RootNamespace>Orbit</RootNamespace>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+        <BuildNumber>0</BuildNumber>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <VersionPrefix>1.2.$(BuildNumber)</VersionPrefix>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    </PropertyGroup>
+
+    <!-- Nuget -->
+    
+    <PropertyGroup> 
         <Title>Orbit.System</Title>
         <Description>Core of the Orbit starter packs</Description>
         <Copyright>Copyright ©2019 Alberto Jose Bec</Copyright>
@@ -16,12 +23,17 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>extensions</PackageTags>
         <Authors>Alberto Bec</Authors>
-        <BuildNumber>0</BuildNumber>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <VersionPrefix>1.2.$(BuildNumber)</VersionPrefix>
-        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <PackageIcon>icon-beta-320.jpg</PackageIcon>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageOutputPath>$(OutputPath)</PackageOutputPath>        
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="../assets/icon-beta-320.jpg" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <!-- /Nuget -->
+    
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <OutputPath>bin\Release\</OutputPath>
         <PlatformTarget>x64</PlatformTarget>
@@ -31,4 +43,5 @@
         <OutputPath>bin\Debug\</OutputPath>
         <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
+
 </Project>
