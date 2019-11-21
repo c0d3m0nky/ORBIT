@@ -384,3 +384,4 @@ fabric.properties
 /.idea/.idea.Orbit/.idea/projectSettingsUpdater.xml
 
 dist/
+*.orig
