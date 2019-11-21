@@ -1,15 +1,40 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Orbit
+namespace Orbit.Experimental
 {
     // based on code at https://gist.github.com/jbtule/4336842#file-aesthenhmac-cs
-    public static class SimpleEncryption
+    // ToDo: Make this fit with Cipher
+    public static class AuthenticatedEncryption
     {
-        public static string SimpleEncrypt(string message, string cryptKey, string authKey)
+        private static readonly Dictionary<Type, Func<SymmetricAlgorithm>> Constructors
+            = typeof(SymmetricAlgorithm).ImplementedBy().Select(t =>
+                {
+                    Func<SymmetricAlgorithm> constructor = null;
+                    var method = t.GetMethods(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(c => c.Name == "Create" && !c.GetParameters().Any() && c.ReturnType == typeof(SymmetricAlgorithm));
+
+                    if (method != null) constructor = () => (SymmetricAlgorithm) method.Invoke(null, null);
+
+                    return new {type = t, constructor};
+                })
+                .Where(t => t.constructor != null)
+                .ToDictionary(t => t.type, t => t.constructor);
+
+        public static string Encrypt(string message, string cryptKey, string authKey)
+            => Encrypt<Aes>(message, cryptKey, authKey);
+        
+        public static string Encrypt<T>(string message, string cryptKey, string authKey) where T : SymmetricAlgorithm
         {
+            var constructor = Constructors.GetValueOrDefault(typeof(T));
+            
+            if(constructor==null) throw new Exception($"Constructor for {typeof(T).FullName} not found");
+            
             var keyBitSize = 256;
             var blockBitSize = 128;
 
@@ -33,7 +58,7 @@ namespace Orbit
             byte[] cipherText;
             byte[] iv;
 
-            using (var aes = Aes.Create())
+            using (var aes = constructor())
             {
                 aes.KeySize = keyBitSize;
                 aes.BlockSize = blockBitSize;
@@ -73,8 +98,15 @@ namespace Orbit
             }
         }
 
-        public static string SimpleDecrypt(string encrypted, string cryptKey, string authKey)
+        public static string Decrypt(string encrypted, string cryptKey, string authKey)
+            => Decrypt<Aes>(encrypted, cryptKey, authKey);
+        
+        public static string Decrypt<T>(string encrypted, string cryptKey, string authKey)
         {
+            var constructor = Constructors.GetValueOrDefault(typeof(T));
+            
+            if(constructor==null) throw new Exception($"Constructor for {typeof(T).FullName} not found");
+            
             var keyBitSize = 256;
             var blockBitSize = 128;
 
@@ -125,7 +157,7 @@ namespace Orbit
                     return null;
                 }
 
-                using (var aes = Aes.Create())
+                using (var aes = constructor())
                 {
                     aes.KeySize = keyBitSize;
                     aes.BlockSize = blockBitSize;

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Orbit
 {
-    public static class Object
+    public static class ObjectExtensions
     {
         
         // Based on Resharper's generated HashCode algorithm

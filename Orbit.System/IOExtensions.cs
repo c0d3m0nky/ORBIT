@@ -2,7 +2,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace Orbit {
-    public static class IO
+    public static class IOExtensions
     {
 
         public static DirectoryInfo Subdirectory(this DirectoryInfo di, params string[] parts)

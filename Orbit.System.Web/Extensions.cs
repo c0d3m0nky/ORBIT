@@ -7,7 +7,6 @@ namespace Orbit.Experimental
 {
     public static class Extensions
     {
-        #region Web
 
         public static Uri Combine(this Uri baseUri, string path)
         {
@@ -26,7 +25,6 @@ namespace Orbit.Experimental
 
             throw new NotImplementedException();
         }
-
-        #endregion
+        
     }
 }

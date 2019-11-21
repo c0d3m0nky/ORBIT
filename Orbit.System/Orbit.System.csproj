@@ -29,7 +29,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../assets/icon-beta-320.jpg" Pack="true" PackagePath="\"/>
+      <None Include="..\assets\icon-beta-320.jpg">
+        <Pack>true</Pack>
+        <PackagePath>/</PackagePath>
+        <Link>assets\icon-beta-320.jpg</Link>
+      </None>
     </ItemGroup>
 
     <!-- /Nuget -->

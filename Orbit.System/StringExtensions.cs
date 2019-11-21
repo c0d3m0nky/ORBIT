@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Orbit
 {
-    public static class String
+    public static class StringExtensions
     {
         // Split string into strings of a max size
         public static IEnumerable<string> Split(this string str, int size)

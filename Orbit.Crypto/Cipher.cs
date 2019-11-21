@@ -1,60 +1,79 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
+using System.Text;
+using Orbit.Experimental;
 
-namespace Orbit
+namespace Orbit.Experimental
 {
-    public abstract class Cipher<T> : IDisposable where T : SymmetricAlgorithm
+    // ToDo: This works, but needs work to reach maturity, I'm still learning best practices around this
+    public class Cipher<T> : IDisposable where T : SymmetricAlgorithm
     {
-        private readonly byte[] _key;
-        private readonly byte[] _iv;
-        private readonly CipherMode _cipherMode;
-        private readonly PaddingMode _paddingMode;
+        private static readonly Dictionary<Type, Func<SymmetricAlgorithm>> Constructors
+            = typeof(SymmetricAlgorithm).ImplementedBy().Select(t =>
+                {
+                    Func<SymmetricAlgorithm> constructor = null;
+                    var method = t.GetMethods(BindingFlags.Static | BindingFlags.Public)
+                        .FirstOrDefault(c => c.Name == "Create" && !c.GetParameters().Any() && c.ReturnType == typeof(SymmetricAlgorithm));
+
+                    if (method != null) constructor = () => (SymmetricAlgorithm) method.Invoke(null, null);
+
+                    return new {type = t, constructor};
+                })
+                .Where(t => t.constructor != null)
+                .ToDictionary(t => t.type, t => t.constructor);
+
         private readonly SymmetricAlgorithm _algorithm;
         private readonly ICryptoTransform _encryptor;
         private readonly ICryptoTransform _decryptor;
 
-        private Cipher()
+        protected Cipher(byte[] key, byte[] iv, CipherMode cipherMode, PaddingMode paddingMode, Func<SymmetricAlgorithm> algorithmFactory = null)
         {
-        }
+            _algorithm = (algorithmFactory ?? Constructors.GetValueOrDefault(typeof(T)))?.Invoke();
 
-        protected Cipher(byte[] key, byte[] iv, CipherMode cipherMode, PaddingMode paddingMode)
-        {
-            _key = key;
-            _iv = iv;
-            _cipherMode = cipherMode;
-            _paddingMode = paddingMode;
-            _algorithm = InstantiateAlgorithm();
+            if (_algorithm == null) throw new Exception($"Constructor for {typeof(T).FullName} not found");
 
-            _algorithm.Key = _key;
-            _algorithm.IV = _iv;
-            _algorithm.Mode = _cipherMode;
-            _algorithm.Padding = _paddingMode;
+            _algorithm.Key = key;
+            // ToDo: support letting the algorithm generate it
+            _algorithm.IV = iv;
+            _algorithm.Mode = cipherMode;
+            _algorithm.Padding = paddingMode;
 
             _encryptor = _algorithm.CreateEncryptor();
             _decryptor = _algorithm.CreateDecryptor();
         }
 
-        protected abstract T InstantiateAlgorithm();
-
         public byte[] Encrypt(byte[] dataBytes) => _encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
 
         public byte[] Decrypt(byte[] encryptedDataBytes) => _decryptor.TransformFinalBlock(encryptedDataBytes, 0, encryptedDataBytes.Length);
-
-        public string Base64Encode(byte[] bytes)
-        {
-            return Convert.ToBase64String(bytes).Replace('+', '-').Replace('/', '_').Replace('=', '~').Trim();
-        }
-
-        public byte[] Base64Decode(string data)
-        {
-            return Convert.FromBase64String(data.Replace('-', '+').Replace('_', '/').Replace('~', '='));
-        }
 
         public virtual void Dispose()
         {
             _encryptor.Dispose();
             _decryptor.Dispose();
             ((IDisposable) _algorithm).Dispose();
+        }
+
+        public static string Encrypt<T>(string message, string base64Key, string base64Iv, Encoding encoding = null, bool webSafeEncode = false, CipherMode cipherMode = CipherMode.CBC,
+            PaddingMode paddingMode = PaddingMode.PKCS7)
+            where T : SymmetricAlgorithm
+        {
+            using (var ciph = new Cipher<T>((base64Key ?? string.Empty).Base64Decode(), (base64Iv ?? string.Empty).Base64Decode(), cipherMode, paddingMode))
+            {
+                return ciph.Encrypt((encoding ?? Encoding.UTF8).GetBytes(message)).Base64Encode(webSafeEncode);
+            }
+        }
+
+        public static string Decrypt<T>(string message, string base64Key, string base64Iv, Encoding encoding = null, CipherMode cipherMode = CipherMode.CBC,
+            PaddingMode paddingMode = PaddingMode.PKCS7)
+            where T : SymmetricAlgorithm
+        {
+            using (var ciph = new Cipher<T>((base64Key ?? string.Empty).Base64Decode(), (base64Iv ?? string.Empty).Base64Decode(), cipherMode, paddingMode))
+            {
+                return (encoding ?? Encoding.UTF8).GetString(ciph.Decrypt(message.Base64Decode()));
+            }
         }
     }
 }

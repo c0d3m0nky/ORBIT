@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Orbit {
-    public static class Collections
+    public static class CollectionsExtensions
     {
         
         public static bool GetNext<T>(this IEnumerator<T> enumerator, out T current)
