@@ -56,21 +56,21 @@ namespace Orbit.Experimental
             ((IDisposable) _algorithm).Dispose();
         }
 
-        public static string Encrypt<T>(string message, string base64Key, string base64Iv, Encoding encoding = null, bool webSafeEncode = false, CipherMode cipherMode = CipherMode.CBC,
+        public static string Encrypt<TS>(string message, string base64Key, string base64Iv, Encoding encoding = null, bool webSafeEncode = false, CipherMode cipherMode = CipherMode.CBC,
             PaddingMode paddingMode = PaddingMode.PKCS7)
-            where T : SymmetricAlgorithm
+            where TS : SymmetricAlgorithm
         {
-            using (var ciph = new Cipher<T>((base64Key ?? string.Empty).Base64Decode(), (base64Iv ?? string.Empty).Base64Decode(), cipherMode, paddingMode))
+            using (var ciph = new Cipher<TS>((base64Key ?? string.Empty).Base64Decode(), (base64Iv ?? string.Empty).Base64Decode(), cipherMode, paddingMode))
             {
                 return ciph.Encrypt((encoding ?? Encoding.UTF8).GetBytes(message)).Base64Encode(webSafeEncode);
             }
         }
 
-        public static string Decrypt<T>(string message, string base64Key, string base64Iv, Encoding encoding = null, CipherMode cipherMode = CipherMode.CBC,
+        public static string Decrypt<TS>(string message, string base64Key, string base64Iv, Encoding encoding = null, CipherMode cipherMode = CipherMode.CBC,
             PaddingMode paddingMode = PaddingMode.PKCS7)
-            where T : SymmetricAlgorithm
+            where TS : SymmetricAlgorithm
         {
-            using (var ciph = new Cipher<T>((base64Key ?? string.Empty).Base64Decode(), (base64Iv ?? string.Empty).Base64Decode(), cipherMode, paddingMode))
+            using (var ciph = new Cipher<TS>((base64Key ?? string.Empty).Base64Decode(), (base64Iv ?? string.Empty).Base64Decode(), cipherMode, paddingMode))
             {
                 return (encoding ?? Encoding.UTF8).GetString(ciph.Decrypt(message.Base64Decode()));
             }

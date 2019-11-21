@@ -26,6 +26,8 @@
         <PackageIcon>icon-320.png</PackageIcon>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>
