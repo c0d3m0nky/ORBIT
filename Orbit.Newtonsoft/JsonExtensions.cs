@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -5,7 +6,22 @@ namespace Orbit
 {
     public static class JsonExtensions
     {
-        
+        public static void Remove(this JArray jArr, Func<JToken, bool> predicate)
+            => jArr?
+                .Select((t, i) => new {t, i})
+                .Where(p => predicate(p.t))
+                .Select(p => p.i)
+                .ToArray()
+                .ForEach((originalIndex, i) => jArr.RemoveAt(originalIndex - i));
+
+
+        public static void Remove(this JObject jObj, Func<JProperty, bool> predicate)
+            => jObj?.Properties()
+                .Where(predicate)
+                .Select(p => p.Name)
+                .ToArray().ForEach(p => jObj.Remove(p));
+
+
         public static bool IsEmpty<TJ>(this TJ json) where TJ : JToken
         {
             if (json == null) return true;
@@ -60,6 +76,5 @@ namespace Orbit
 
         public static string ToString<TJ>(this TJ json, Newtonsoft.Json.Formatting formatting, Json.MinifyOptions options) where TJ : JToken
             => json.Minify(options).ToString(formatting);
-
     }
 }

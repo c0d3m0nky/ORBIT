@@ -6,10 +6,52 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Orbit {
-    public static class CollectionsExtensions
+namespace Orbit
+{
+    public static class Series
     {
         
+        public static IList<T> Generate<T>(T seed, Func<IList<T>, T> function, Func<IList<T>, bool> continueSeries)
+            => Generate(new List<T> {seed}, function, continueSeries);
+
+        public static IList<T> Generate<T>(IList<T> seed, Func<IList<T>, T> function, Func<IList<T>, bool> continueSeries)
+        {
+            var result = seed?.ToList() ?? new List<T>();
+
+            while (continueSeries(result))
+            {
+                result.Add(function(result));
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<int> Generate(int from, int to)
+            => Generate(from, (i, l) => l + 1, (i, l) => l < to);
+
+        public static IEnumerable<T> Generate<T>(Func<T> function, Func<int, T, bool> continueSeries)
+            => Generate(function(), (i, l) => function(), continueSeries);
+
+        public static IEnumerable<T> Generate<T>(T seed, Func<int, T, T> function, Func<int, T, bool> continueSeries)
+        {
+            var i = 0;
+            var last = seed;
+
+            yield return seed;
+
+            while (continueSeries(i, last))
+            {
+                last = function(i, last);
+
+                yield return last;
+
+                i++;
+            }
+        }
+    }
+
+    public static class CollectionsExtensions
+    {
         public static bool GetNext<T>(this IEnumerator<T> enumerator, out T current)
         {
             if (enumerator.MoveNext())
@@ -37,7 +79,7 @@ namespace Orbit {
             }
         }
 
-#if NETSTANDARD2_0 
+#if NETSTANDARD2_0
         // These will be included in NetStandard2.1
         public static TValue GetValueOrDefault<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary,
@@ -68,8 +110,8 @@ namespace Orbit {
 
             if (removals.Any())
             {
-                removals.ForEach(r=>source.Remove(r.Key));
-                
+                removals.ForEach(r => source.Remove(r.Key));
+
                 return true;
             }
 
@@ -126,7 +168,7 @@ namespace Orbit {
 
         public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> body)
         {
-            if (source == null)
+            if (source != null)
             {
                 var i = 0;
 
@@ -235,6 +277,5 @@ namespace Orbit {
                 dic.Add(i.key, i.value);
             }
         }
-
     }
 }
