@@ -9,6 +9,7 @@
         <AssemblyVersion>1.0.0</AssemblyVersion>
         <VersionPrefix>1.2.$(BuildNumber)</VersionPrefix>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>8.0</LangVersion>
     </PropertyGroup>
 
     <!-- Nuget -->

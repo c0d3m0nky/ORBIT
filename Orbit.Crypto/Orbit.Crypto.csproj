@@ -6,6 +6,7 @@
         <BuildNumber>0</BuildNumber>
         <AssemblyVersion>1.0.0</AssemblyVersion>
         <VersionPrefix>1.2.$(BuildNumber)</VersionPrefix>
+        <LangVersion>8.0</LangVersion>
     </PropertyGroup>
 
     <!-- Nuget -->
@@ -25,6 +26,7 @@
         <PackageOutputPath>$(OutputPath)</PackageOutputPath>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <LangVersion>8.0</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

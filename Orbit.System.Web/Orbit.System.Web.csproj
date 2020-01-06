@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>8.0</LangVersion>
         <RootNamespace>Orbit</RootNamespace>
         <BuildNumber>0</BuildNumber>
         <AssemblyVersion>1.0.0</AssemblyVersion>
