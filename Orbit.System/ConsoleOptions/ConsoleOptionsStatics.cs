@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace Orbit {
+namespace Orbit
+{
     public static class ConsoleOptions
     {
         public static bool CancelPromptShown = false;
@@ -187,7 +189,22 @@ namespace Orbit {
             return fields;
         }
 
-        public static string GetInput(string question, Func<string, bool> isValid = null, Func<string, string> mutate = null, bool allowCancel = true)
+        public static Task<string> GetInput(string question, Func<string, Task<bool>> isValid = null, Func<string, Task<string>> mutate = null, bool allowCancel = true)
+            => GetInput(question, isValid, mutate ?? Task.FromResult, null, allowCancel);
+
+        public static Task<T> GetInput<T>(string question, Func<string, Task<bool>> isValid, Func<string, Task<T>> mutate, bool allowCancel = true)
+            => GetInput(question, isValid, mutate, null, allowCancel);
+
+        public static Task<T> GetInput<T>(string question, Func<string, Task<T>> mutate, Func<T, Task<bool>> isValid = null, bool allowCancel = true)
+            => GetInput(question, null, mutate, isValid, allowCancel);
+
+        public static string GetInput(string question)
+            => GetInput(question, null, null, (Func<string, bool>) null, true);
+
+        public static string GetInput(string question, Func<string, bool> isValid)
+            => GetInput(question, isValid, null, (Func<string, bool>) null, true);
+
+        public static string GetInput(string question, Func<string, bool> isValid, Func<string, string> mutate, bool allowCancel = true)
             => GetInput(question, isValid, mutate ?? (s => s), null, allowCancel);
 
         public static T GetInput<T>(string question, Func<string, bool> isValid, Func<string, T> mutate, bool allowCancel = true)
@@ -198,11 +215,9 @@ namespace Orbit {
 
         public static T GetInput<T>(string question, Func<string, bool> preValid, Func<string, T> mutate, Func<T, bool> postValid, bool allowCancel)
         {
+            ValidateGetInput(question, mutate);
+
             if (allowCancel) ShowCancelPrompt();
-
-            if (question.IsNullOrWhitespace()) return default;
-
-            if (mutate == null) throw new ArgumentException($"{nameof(mutate)} cannot be null");
 
             var meta = QuestionMeta(question, true);
 
@@ -211,14 +226,7 @@ namespace Orbit {
 
             do
             {
-                meta.setColor();
-
-                if (meta.isMultiline || meta.isEmpty) Console.WriteLine($"{question}");
-                else Console.Write($"{question} ");
-
-                meta.resetColor();
-
-                var resp = InputOrScript();
+                var resp = GetInputAsk(question, meta);
 
                 if (allowCancel && string.Equals(resp, "c", StringComparison.CurrentCultureIgnoreCase)) return default;
 
@@ -229,6 +237,52 @@ namespace Orbit {
                     if (postValid(mut)) return mut;
                 }
             } while (true);
+        }
+
+        public static async Task<T> GetInput<T>(string question, Func<string, Task<bool>> preValid, Func<string, Task<T>> mutate, Func<T, Task<bool>> postValid, bool allowCancel)
+        {
+            ValidateGetInput(question, mutate);
+
+            if (allowCancel) ShowCancelPrompt();
+
+            var meta = QuestionMeta(question, true);
+
+            preValid ??= (s => Task.FromResult(true));
+            postValid ??= s => Task.FromResult(true);
+
+            do
+            {
+                var resp = GetInputAsk(question, meta);
+
+                if (allowCancel && string.Equals(resp, "c", StringComparison.CurrentCultureIgnoreCase)) return default;
+
+                if (await preValid(resp))
+                {
+                    var mut = await mutate(resp);
+
+                    if (await postValid(mut)) return mut;
+                }
+            } while (true);
+        }
+
+        private static string GetInputAsk(string question, (string question, Action setColor, Action resetColor, bool isMultiline, bool isEmpty) meta)
+        {
+            meta.setColor();
+
+            if (meta.isMultiline || meta.isEmpty) Console.WriteLine($"{question}");
+            else Console.Write($"{question} ");
+
+            meta.resetColor();
+
+            return InputOrScript();
+        }
+
+
+        private static void ValidateGetInput(string question, Delegate mutate)
+        {
+            if (question.IsNullOrWhitespace()) throw new ArgumentException($"{nameof(question)} cannot be null or empty");
+
+            if (mutate == null) throw new ArgumentException($"{nameof(mutate)} cannot be null");
         }
     }
 }
