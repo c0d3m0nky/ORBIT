@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,83 +10,110 @@ namespace Orbit
 {
     public static class ConsoleOptions
     {
-        public static bool CancelPromptShown = false;
+        public enum Color
+        {
+            Default = -1,
+            Ask,
+            AskDivider,
+            Cancel,
+            Info,
+            Error
+        }
+
         public static IEnumerator<string> Script = null;
         public static TimeSpan ScriptSleep = TimeSpan.Zero;
-        public static ConsoleColor CancelColor = ConsoleColor.Magenta;
-        public static ConsoleColor InfoColor = ConsoleColor.DarkYellow;
-        public static ConsoleColor ErrorColor = ConsoleColor.Red;
-        public static ConsoleColor AskDividerColor = ConsoleColor.Green;
-        public static ConsoleColor AskColor = ConsoleColor.DarkCyan;
+        public static IConsole Console = new DefaultConsole();
+        
+        private const string ScriptPauseChar = "*";
+        private static bool CancelPromptShown = false;
 
         private static void ShowCancelPrompt()
         {
             if (!CancelPromptShown)
             {
-                var currentColor = Console.ForegroundColor;
-
-                Console.ForegroundColor = InfoColor;
                 Console.WriteLine();
-                Console.Write("When you see prompts in ");
-                Console.ForegroundColor = CancelColor;
-                Console.Write(CancelColor.ToString());
-                Console.ForegroundColor = InfoColor;
-                Console.Write(" it means you can enter 'c' to cancel");
+                Console.Write("When you see prompts in ", Color.Info);
+                Console.Write(Console.CancelColor.ToString(), Color.Cancel);
+                Console.Write(" it means you can enter 'c' to cancel", Color.Info);
                 Console.WriteLine();
                 CancelPromptShown = true;
-                Console.ForegroundColor = currentColor;
             }
         }
 
-        private static (string question, Action setColor, Action resetColor, bool isMultiline, bool isEmpty) QuestionMeta(string question, bool allowCancel)
+        private static (string question, bool isMultiline, bool isEmpty, Color color) QuestionMeta(string question, bool allowCancel)
         {
-            var currentColor = Console.ForegroundColor;
-            Action nullAction = () => { };
-            Action setCancelColor = () => Console.ForegroundColor = CancelColor;
-            Action resetCancelColor = () => Console.ForegroundColor = currentColor;
-
             question = question.IfNullOrWhitespace("").Trim();
 
-            return (question, setColor: allowCancel ? setCancelColor : nullAction, allowCancel ? resetCancelColor : nullAction, question.Contains("\n"), question.IsNullOrWhitespace());
+            return (question, question.Contains("\n"), question.IsNullOrWhitespace(), allowCancel ? Color.Cancel : Color.Default);
+        }
+
+        internal static SecureString InputMaskedOrScript()
+        {
+            var ss = new SecureString();
+
+            if (HandledByScript(out var resp)) resp.ForEach(c => ss.AppendChar(c));
+            else
+            {
+                do
+                {
+                    var key = Console.ReadKey();
+
+                    if (key.Key == ConsoleKey.Enter) break;
+
+                    if (key.Key == ConsoleKey.Escape) return null;
+
+                    if (key.Key == ConsoleKey.Backspace)
+                    {
+                        if (ss.Length > 0)
+                        {
+                            ss.RemoveAt(ss.Length - 1);
+                            Console.Write("\b \b", Color.Default);
+                        }
+                    }
+                    else
+                    {
+                        ss.AppendChar(key.KeyChar);
+                        Console.Write("*", Color.Default);
+                    }
+                } while (true);
+            }
+
+            return ss;
         }
 
         internal static string InputOrScript()
         {
-            const string pauseChar = "*";
+            return !HandledByScript(out var resp) ? Console.ReadLine() : resp;
+        }
 
-            bool handledByScript(out string r)
+        private static bool HandledByScript(out string r)
+        {
+            r = null;
+
+            if (Script == null) return false;
+
+            do
             {
-                r = null;
+                var end = !Script.GetNext(out r);
 
-                if (Script == null) return false;
-
-                do
+                if (end)
                 {
-                    var end = !Script.GetNext(out r);
+                    Script = null;
+                    r = null;
+                    return false;
+                }
 
-                    if (end)
-                    {
-                        Script = null;
-                        r = null;
-                        return false;
-                    }
+                if (r == ScriptPauseChar)
+                {
+                    Console.Write("Script Paused. Enter to continue, Ctrl+c to end", Color.Default);
+                    Console.ReadLine();
+                }
+            } while (r != ScriptPauseChar);
 
-                    if (r == pauseChar)
-                    {
-                        Console.Write("Script Paused. Enter to continue, Ctrl+c to end");
-                        Console.ReadLine();
-                    }
-                } while (r != pauseChar);
+            Console.WriteLine(r, Color.Default);
+            if (ScriptSleep > TimeSpan.Zero) Thread.Sleep((int) ScriptSleep.TotalMilliseconds);
 
-                Console.WriteLine(r);
-                if (ScriptSleep > TimeSpan.Zero) Thread.Sleep((int) ScriptSleep.TotalMilliseconds);
-
-                return true;
-            }
-
-            if (!handledByScript(out var resp)) return Console.ReadLine();
-
-            return resp;
+            return true;
         }
 
         public static bool? YesNoCancel(string question)
@@ -95,12 +124,8 @@ namespace Orbit
 
             do
             {
-                meta.setColor();
-
-                if (meta.isMultiline) Console.WriteLine($"{meta.question}");
-                else Console.Write($"{meta.question} ");
-
-                meta.resetColor();
+                if (meta.isMultiline) Console.WriteLine($"{meta.question}", meta.color);
+                else Console.Write($"{meta.question} ", meta.color);
 
                 var resp = InputOrScript();
 
@@ -119,12 +144,8 @@ namespace Orbit
 
             do
             {
-                meta.setColor();
-
-                if (meta.isMultiline) Console.WriteLine($"{question}");
-                else Console.Write($"{question} ");
-
-                meta.resetColor();
+                if (meta.isMultiline) Console.WriteLine($"{question}", meta.color);
+                else Console.Write($"{question} ", meta.color);
 
                 yn = InputOrScript().ParseBool();
             } while (!yn.HasValue);
@@ -137,8 +158,9 @@ namespace Orbit
             var meta = QuestionMeta(question, allowCancel);
             var explain = $"Enter fields as key:value";
 
-            Console.WriteLine(question);
-            Console.WriteLine(explain);
+            Console.WriteLine(question, meta.color);
+            Console.WriteLine(explain, meta.color);
+
             var fields = new Dictionary<string, object>();
 
             do
@@ -158,11 +180,9 @@ namespace Orbit
 
                 if (spl.Length != 2 || spl.Any(s => s.IsNullOrWhitespace()))
                 {
-                    Console.ForegroundColor = ErrorColor;
                     Console.WriteLine();
-                    Console.WriteLine("Invalid entry");
-                    Console.WriteLine(explain);
-                    meta.resetColor();
+                    Console.WriteLine("Invalid entry", Color.Error);
+                    Console.WriteLine(explain, Color.Error);
                     continue;
                 }
 
@@ -199,10 +219,10 @@ namespace Orbit
             => GetInput(question, null, mutate, isValid, allowCancel);
 
         public static string GetInput(string question)
-            => GetInput(question, null, null, (Func<string, bool>) null, true);
+            => GetInput(question, null, s => s, null, true);
 
         public static string GetInput(string question, Func<string, bool> isValid)
-            => GetInput(question, isValid, null, (Func<string, bool>) null, true);
+            => GetInput(question, isValid, s => s, (Func<string, bool>) null, true);
 
         public static string GetInput(string question, Func<string, bool> isValid, Func<string, string> mutate, bool allowCancel = true)
             => GetInput(question, isValid, mutate ?? (s => s), null, allowCancel);
@@ -219,10 +239,10 @@ namespace Orbit
 
             if (allowCancel) ShowCancelPrompt();
 
-            var meta = QuestionMeta(question, true);
+            var meta = QuestionMeta(question, allowCancel);
 
-            preValid = preValid ?? (s => true);
-            postValid = postValid ?? (s => true);
+            preValid ??= (s => true);
+            postValid ??= (s => true);
 
             do
             {
@@ -245,7 +265,7 @@ namespace Orbit
 
             if (allowCancel) ShowCancelPrompt();
 
-            var meta = QuestionMeta(question, true);
+            var meta = QuestionMeta(question, allowCancel);
 
             preValid ??= (s => Task.FromResult(true));
             postValid ??= s => Task.FromResult(true);
@@ -265,18 +285,25 @@ namespace Orbit
             } while (true);
         }
 
-        private static string GetInputAsk(string question, (string question, Action setColor, Action resetColor, bool isMultiline, bool isEmpty) meta)
+        private static string GetInputAsk(string question, (string question, bool isMultiline, bool isEmpty, Color color) meta)
         {
-            meta.setColor();
-
-            if (meta.isMultiline || meta.isEmpty) Console.WriteLine($"{question}");
-            else Console.Write($"{question} ");
-
-            meta.resetColor();
+            if (meta.isMultiline || meta.isEmpty) Console.WriteLine($"{question}", meta.color);
+            else Console.Write($"{question} ", meta.color);
 
             return InputOrScript();
         }
 
+        public static SecureString GetMaskedInput(string question)
+        {
+            ValidateGetInput(question, (Func<string, string>) (s => s));
+
+            var meta = QuestionMeta(question, false);
+
+            if (meta.isMultiline || meta.isEmpty) Console.WriteLine($"{question}", meta.color);
+            else Console.Write($"{question} ", meta.color);
+
+            return InputMaskedOrScript();
+        }
 
         private static void ValidateGetInput(string question, Delegate mutate)
         {

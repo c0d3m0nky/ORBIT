@@ -44,12 +44,12 @@ namespace Orbit
 
             var cc = Console.ForegroundColor;
 
-            Console.ForegroundColor = ConsoleOptions.AskDividerColor;
+            Console.ForegroundColor = ConsoleOptions.Console.AskDividerColor;
             Console.WriteLine();
             Console.WriteLine("-----");
             Console.WriteLine();
 
-            Console.ForegroundColor = ConsoleOptions.AskColor;
+            Console.ForegroundColor = ConsoleOptions.Console.AskColor;
 
             Option<T> opt = null;
 
